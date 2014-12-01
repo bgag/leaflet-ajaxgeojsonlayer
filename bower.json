@@ -1,0 +1,19 @@
+{
+  "name": "leaflet-ajaxgeojsonlayer",
+  "description": "Layer based on dynamic loaded GeoJSON data",
+  "homepage": "https://github.com/bgag/leaflet-ajaxgeojsonlayer",
+  "version": "0.0.1",
+  "keywords": [
+    "ajax",
+    "geojson",
+    "leaflet"
+  ],
+  "main": [
+    "leaflet.ajaxgeojsonlayer.js"
+  ],
+  "ignore": [],
+  "dependencies": {
+    "jquery": ">= 1.11.0",
+    "leaflet": ">= 0.7.0"
+  }
+}
