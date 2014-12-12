@@ -8,46 +8,78 @@
  * @param url
  * @param map
  * @param options
- * @returns {*}
  */
-L.ajaxGeoJSONLayer = function (url, map, options) {
-  var
-    layer = L.layerGroup(),
-    geoJsonLayer;
+L.AjaxGeoJSONLayer = L.Class.extend({
+  includes: L.Mixin.Events,
+  initialize: function (url, options) {
+    this._url = url;
+    this._options = options;
+    this._layers = {};
+    this._geoJsonLayer = null;
+    this._updateBindThis = this.update.bind(this);
 
-  var buildUrl = function () {
-    return url + '?bounds=' + map.getBounds().toBBoxString();
-  };
+    if (!('geoJsonLayers' in this._options)) {
+      this._options.geoJsonLayers = {};
+    }
+  },
+  onAdd: function (map) {
+    this._map = map;
 
-  if ('onChange' in options) {
-    layer.onChange = options.onChange;
-  } else {
-    layer.onChange = function () {};
-  }
+    map.on('moveend', this._updateBindThis);
 
-  layer.update = function () {
-    $.getJSON(buildUrl(), function (data) {
-      if (geoJsonLayer != null) {
-        layer.removeLayer(geoJsonLayer);
+    this.update();
+  },
+  onRemove: function (map) {
+    this._map = null;
+
+    map.off('moveend', this._updateBindThis);
+
+    map.removeLayer(this._geoJsonLayer);
+  },
+  addLayer: function (layer) {
+    var id = this.getLayerId(layer);
+
+    this._layers[id] = layer;
+
+    if (this._map) {
+      this._map.addLayer(layer);
+    }
+
+    return this;
+  },
+  removeLayer: function (layer) {
+    var id = layer in this._layers ? layer : this.getLayerId(layer);
+
+    if (this._map && this._layers[id]) {
+      this._map.removeLayer(this._layers[id]);
+    }
+
+    delete this._layers[id];
+
+    return this;
+  },
+  getLayers: function () {
+    return this._geoJsonLayer.getLayers();
+  },
+  getLayerId: function (layer) {
+    return L.stamp(layer);
+  },
+  buildUrl: function () {
+    return this._url + '?bounds=' + this._map.getBounds().toBBoxString();
+  },
+  update: function () {
+    var self = this;
+
+    $.getJSON(self.buildUrl(), function (data) {
+      if (self._geoJsonLayer != null) {
+        self.removeLayer(self._geoJsonLayer);
       }
 
-      geoJsonLayer = L.geoJson(data, options);
+      self._geoJsonLayer = L.geoJson(data, self._options.geoJsonLayers);
 
-      layer.addLayer(geoJsonLayer);
+      self.addLayer(self._geoJsonLayer);
 
-      layer.onChange(geoJsonLayer);
+      self.fireEvent('update', self._geoJsonLayer);
     });
-  };
-
-  // update once for initial load...
-  layer.update();
-
-  // ...and on each moveend event
-  map.on('moveend', function () {
-    layer.update();
-  });
-
-  layer.addTo(map);
-
-  return layer;
-};
+  }
+});
