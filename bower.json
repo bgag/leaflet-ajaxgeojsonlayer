@@ -2,7 +2,7 @@
   "name": "leaflet-ajaxgeojsonlayer",
   "description": "Layer based on dynamic loaded GeoJSON data",
   "homepage": "https://github.com/bgag/leaflet-ajaxgeojsonlayer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "keywords": [
     "ajax",
     "geojson",

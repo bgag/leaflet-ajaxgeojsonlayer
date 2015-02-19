@@ -15,12 +15,30 @@ L.AjaxGeoJSONLayer = L.Class.extend({
     this._url = url;
     this._options = options;
     this._layers = {};
+    this._enabled = true;
     this._geoJsonLayer = null;
     this._updateBindThis = this.update.bind(this);
 
     if (!('geoJsonLayers' in this._options)) {
       this._options.geoJsonLayers = {};
     }
+  },
+  enable: function () {
+    this._enabled = true;
+
+    if (this._geoJsonLayer != null) {
+      this.addLayer(this._geoJsonLayer);
+    }
+  },
+  disable: function () {
+    this._enabled = false;
+
+    if (this._geoJsonLayer != null) {
+      this.removeLayer(this._geoJsonLayer);
+    }
+  },
+  enabled: function () {
+    return this._enabled;
   },
   onAdd: function (map) {
     this._map = map;
@@ -69,6 +87,10 @@ L.AjaxGeoJSONLayer = L.Class.extend({
   },
   update: function () {
     var self = this;
+
+    if (!self._enabled) {
+      return;
+    }
 
     $.getJSON(self.buildUrl(), function (data) {
       if (self._geoJsonLayer != null) {
