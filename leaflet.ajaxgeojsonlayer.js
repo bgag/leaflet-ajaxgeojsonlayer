@@ -77,7 +77,7 @@ L.AjaxGeoJSONLayer = L.Class.extend({
     return this;
   },
   getLayers: function () {
-    return this._geoJsonLayer.getLayers();
+    return this._geoJsonLayer ? this._geoJsonLayer.getLayers() : [];
   },
   getLayerId: function (layer) {
     return L.stamp(layer);
