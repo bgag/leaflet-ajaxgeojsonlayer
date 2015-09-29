@@ -2,6 +2,11 @@
 
 'use strict';
 
+if (module && module.exports) {
+  var L = require('leaflet');
+} else {
+  //do nothing
+}
 
 /**
  * Layer based on dynamic loaded GeoJSON data
@@ -9,7 +14,7 @@
  * @param map
  * @param options
  */
-L.AjaxGeoJSONLayer = L.Class.extend({
+var AjaxGeoJSONLayer = L.Class.extend({
   includes: L.Mixin.Events,
   initialize: function (url, options) {
     this._url = url;
@@ -103,5 +108,27 @@ L.AjaxGeoJSONLayer = L.Class.extend({
 
       self.fireEvent('update', self._geoJsonLayer);
     });
+  },
+  setStyle: function (style) {
+    if (!style)
+      return;
+    var self = this;
+    self._options.geoJsonLayers.style = style;
+  },
+  resetStyle: function () {
+    var self = this;
+    self._options.geoJsonLayers.style = self._options.style;
+  },
+  zoomToLayer: function () {
+    var self = this;
+    if (this._geoJsonLayer){
+      this._map.fitBounds(this._geoJsonLayer.getBounds());
+    }
   }
 });
+
+if (module && module.exports) {
+  module.exports = AjaxGeoJSONLayer;
+} else {
+  L.AjaxGeoJSONLayer = AjaxGeoJSONLayer;
+}
