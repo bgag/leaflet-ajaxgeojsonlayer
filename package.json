@@ -1,6 +1,6 @@
 {
   "name": "leaflet-ajaxgeojsonlayer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Makes LayerGroups clickable via fill and handles clicks",
   "main": "leaflet.ajaxgeojsonlayer.js",
   "scripts": {
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/bgag/leaflet-ajaxgeojsonlayer/issues"
   },
-  "homepage": "https://github.com/bgag/leaflet-ajaxgeojsonlayer"
+  "homepage": "https://github.com/bgag/leaflet-ajaxgeojsonlayer",
+  "dependencies": {
+    "leaflet": "0.7.5"
+  }
 }
