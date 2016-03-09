@@ -127,7 +127,7 @@ var AjaxGeoJSONLayer = L.Class.extend({
   }
 });
 
-if (module && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
   module.exports = AjaxGeoJSONLayer;
 } else {
   L.AjaxGeoJSONLayer = AjaxGeoJSONLayer;
