@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/bgag/leaflet-ajaxgeojsonlayer/issues"
   },
-  "homepage": "https://github.com/bgag/leaflet-ajaxgeojsonlayer"
+  "homepage": "https://github.com/bgag/leaflet-ajaxgeojsonlayer",
+  "dependencies": {
+    "leaflet": "0.7.5"
+  }
 }

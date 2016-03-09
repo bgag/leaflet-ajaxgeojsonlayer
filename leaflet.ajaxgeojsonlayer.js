@@ -2,7 +2,7 @@
 
 'use strict';
 
-if (module && module.exports) {
+if (typeof module !== 'undefined' && module.exports) {
   var L = require('leaflet');
 } else {
   //do nothing
