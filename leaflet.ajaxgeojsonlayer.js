@@ -1,134 +1,138 @@
-/* global $:false, L:true */
+/* global $ */
 
-'use strict';
+'use strict'
 
 if (typeof module !== 'undefined' && module.exports) {
-  var L = require('leaflet');
-} else {
-  //do nothing
+  var L = require('leaflet')
+}
+
+function buildUrl () {
+  return this._url + '?bounds=' + this._map.getBounds().toBBoxString()
+}
+
+function jqueryFetch (url) {
+  return new Promise(function (resolve, reject) {
+    $.ajax(url, {
+      contentType: 'application/json'
+    }).done(function (data) {
+      resolve(data)
+    }).fail(function (xhr, status, err) {
+      reject(err)
+    })
+  })
 }
 
 /**
  * Layer based on dynamic loaded GeoJSON data
  * @param url
- * @param map
  * @param options
  */
-var AjaxGeoJSONLayer = L.Class.extend({
-  includes: L.Mixin.Events,
+var AjaxGeoJSONLayer = L.Layer.extend({
   initialize: function (url, options) {
-    this._url = url;
-    this._options = options;
-    this._layers = {};
-    this._enabled = true;
-    this._geoJsonLayer = null;
-    this._updateBindThis = this.update.bind(this);
+    this._url = url
+    this._options = options || {}
+    this._layers = {}
+    this._enabled = true
+    this._geoJsonLayer = null
 
-    if (!('geoJsonLayers' in this._options)) {
-      this._options.geoJsonLayers = {};
-    }
+    this._options.geoJsonLayers = this._options.geoJsonLayers || {}
+    this._options.buildUrl = this._options.buildUrl || buildUrl.bind(this)
+    this._options.fetch = this._options.fetch || jqueryFetch
+
+    this._updateBindThis = this.update.bind(this)
   },
+
   enable: function () {
-    this._enabled = true;
+    this._enabled = true
 
-    if (this._geoJsonLayer != null) {
-      this.addLayer(this._geoJsonLayer);
+    if (this._geoJsonLayer) {
+      this.addLayer(this._geoJsonLayer)
     }
   },
+
   disable: function () {
-    this._enabled = false;
+    this._enabled = false
 
-    if (this._geoJsonLayer != null) {
-      this.removeLayer(this._geoJsonLayer);
+    if (this._geoJsonLayer) {
+      this.removeLayer(this._geoJsonLayer)
     }
   },
+
   enabled: function () {
-    return this._enabled;
+    return this._enabled
   },
+
   onAdd: function (map) {
-    this._map = map;
+    this._map = map
 
-    map.on('moveend', this._updateBindThis);
+    map.on('moveend', this._updateBindThis)
 
-    this.update();
+    this.update()
   },
+
   onRemove: function (map) {
-    this._map = null;
+    this._map = null
 
-    map.off('moveend', this._updateBindThis);
+    map.off('moveend', this._updateBindThis)
 
-    map.removeLayer(this._geoJsonLayer);
+    map.removeLayer(this._geoJsonLayer)
   },
-  addLayer: function (layer) {
-    var id = this.getLayerId(layer);
 
-    this._layers[id] = layer;
+  addLayer: function (layer) {
+    var id = this.getLayerId(layer)
+
+    this._layers[id] = layer
 
     if (this._map) {
-      this._map.addLayer(layer);
+      this._map.addLayer(layer)
     }
 
-    return this;
+    return this
   },
+
   removeLayer: function (layer) {
-    var id = layer in this._layers ? layer : this.getLayerId(layer);
+    var id = layer in this._layers ? layer : this.getLayerId(layer)
 
     if (this._map && this._layers[id]) {
-      this._map.removeLayer(this._layers[id]);
+      this._map.removeLayer(this._layers[id])
     }
 
-    delete this._layers[id];
+    delete this._layers[id]
 
-    return this;
+    return this
   },
+
   getLayers: function () {
-    return this._geoJsonLayer ? this._geoJsonLayer.getLayers() : [];
+    return this._geoJsonLayer ? this._geoJsonLayer.getLayers() : []
   },
-  getLayerId: function (layer) {
-    return L.stamp(layer);
-  },
-  buildUrl: function () {
-    return this._url + '?bounds=' + this._map.getBounds().toBBoxString();
-  },
-  update: function () {
-    var self = this;
 
-    if (!self._enabled) {
-      return;
+  getLayerId: function (layer) {
+    return L.stamp(layer)
+  },
+
+  update: function () {
+    var self = this
+
+    if (!this._enabled) {
+      return
     }
 
-    $.getJSON(self.buildUrl(), function (data) {
-      if (self._geoJsonLayer != null) {
-        self.removeLayer(self._geoJsonLayer);
+    this._options.fetch(self._options.buildUrl()).then(function (data) {
+      if (self._geoJsonLayer) {
+        self.removeLayer(self._geoJsonLayer)
       }
 
-      self._geoJsonLayer = L.geoJson(data, self._options.geoJsonLayers);
+      self._geoJsonLayer = L.geoJson(data, self._options.geoJsonLayers)
 
-      self.addLayer(self._geoJsonLayer);
+      self.addLayer(self._geoJsonLayer)
 
-      self.fireEvent('update', self._geoJsonLayer);
-    });
-  },
-  setStyle: function (style) {
-    if (!style)
-      return;
-    var self = this;
-    self._options.geoJsonLayers.style = style;
-  },
-  resetStyle: function () {
-    var self = this;
-    self._options.geoJsonLayers.style = self._options.style;
-  },
-  zoomToLayer: function () {
-    var self = this;
-    if (this._geoJsonLayer){
-      this._map.fitBounds(this._geoJsonLayer.getBounds());
-    }
+      self.fireEvent('update', self._geoJsonLayer)
+    })
   }
-});
+})
 
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = AjaxGeoJSONLayer;
+  module.exports = AjaxGeoJSONLayer
 } else {
-  L.AjaxGeoJSONLayer = AjaxGeoJSONLayer;
+  L.AjaxGeoJSONLayer = AjaxGeoJSONLayer
 }
