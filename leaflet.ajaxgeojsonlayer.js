@@ -13,7 +13,9 @@ function buildUrl () {
 function jqueryFetch (url) {
   return new Promise(function (resolve, reject) {
     $.ajax(url, {
-      contentType: 'application/json'
+      headers: {
+        accept: 'application/json'
+      }
     }).done(function (data) {
       resolve(data)
     }).fail(function (xhr, status, err) {
