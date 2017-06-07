@@ -1,6 +1,6 @@
 {
   "name": "leaflet-ajaxgeojsonlayer",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "GeoJSON layer with automatic updates based on the bounding box for the current view",
   "main": "leaflet.ajaxgeojsonlayer.js",
   "scripts": {
