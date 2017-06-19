@@ -92,18 +92,6 @@ var AjaxGeoJSONLayer = L.Layer.extend({
     return this
   },
 
-  removeLayer: function (layer) {
-    var id = layer in this._layers ? layer : this.getLayerId(layer)
-
-    if (this._map && this._layers[id]) {
-      this._map.removeLayer(this._layers[id])
-    }
-
-    delete this._layers[id]
-
-    return this
-  },
-
   getLayers: function () {
     return this._geoJsonLayer ? this._geoJsonLayer.getLayers() : []
   },
@@ -121,7 +109,7 @@ var AjaxGeoJSONLayer = L.Layer.extend({
 
     this._options.fetch(self._options.buildUrl()).then(function (data) {
       if (self._geoJsonLayer) {
-        self.removeLayer(self._geoJsonLayer)
+        self._map.removeLayer(self._geoJsonLayer)
       }
 
       self._geoJsonLayer = L.geoJson(data, self._options.geoJsonLayers)
